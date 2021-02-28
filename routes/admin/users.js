@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var models = require('../../models');
+var bcrypt = require('bcryptjs');
 var Op = models.Sequelize.Op
 
 // 文章列表
@@ -17,20 +18,19 @@ router.get('/', async function (req, res, next) {
             [Op.like]: '%' + title + '%'
         }
     }
-
-    var result = await models.Article.findAndCountAll({
+    var result = await models.User.findAndCountAll({
         order: [['id', 'DESC']],
         where: where,
-        include: {
-            model:models.ArticleCategory,
-            as:'category'
-        },
+        // include: {
+        //     model:models.UserCategory,
+        //     as:'category'
+        // },
         offset: (currentPage - 1) * pageSize,
         limit: pageSize
     });
 
     res.json({
-        articles: result.rows,
+        Users: result.rows,
         pagination: {
             currentPage: currentPage,
             pageSize: pageSize,
@@ -43,29 +43,54 @@ router.get('/', async function (req, res, next) {
 
 // 新增
 router.post('/', async function (req, res, next) {
-    var article = await models.Article.create(req.body)
-    res.json({article: article});
-});
+    let username = req.body.username
+    let password = req.body.password
+  let findUser = await models.User.findOne({
+    where: {username: username}
+  })
+  
+    if(findUser){
+      return res.json({
+        success: false,
+        message: '用户名已注册！'
+      });
+    }
+  
+    password = bcrypt.hashSync(password, 8);
+    
+    let user = await models.User.create({
+      username: username,
+      password: password,
+      admin: true
+  })
+  
+    res.json({  success: true,
+      message: '请求成功',
+      user: {
+        id: user.id,
+        name: user.username
+    }});
+  });
 
 // 查询单条文章
 router.get('/:id', async function (req, res, next) {
-    var article = await models.Article.findOne({
+    var User = await models.User.findOne({
         where: {id: req.params.id},
     });
-    res.json({article: article});
+    res.json({User: User});
 });
 
 // 修改
 router.put('/:id', async function (req, res, next) {
-    var article = await models.Article.findByPk(req.params.id);
-    article.update(req.body);
-    res.json({article: article});
+    var User = await models.User.findByPk(req.params.id);
+    User.update(req.body);
+    res.json({User: User});
 });
 
 // 删除
 router.delete('/:id', async function (req, res, next) {
-    var article = await models.Article.findByPk(req.params.id);
-    article.destroy();
+    var User = await models.User.findByPk(req.params.id);
+    User.destroy();
     res.json({msg: '删除成功'});
 });
 

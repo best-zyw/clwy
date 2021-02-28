@@ -83,7 +83,9 @@ router.delete('/:id', async function (req, res, next) {
         });
     }
     category.destroy();
-    res.json({success: true,data:{
+    res.json({success: true,
+        msg: '删除成功',
+        data:{
             category: category,
         }});
 });

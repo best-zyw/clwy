@@ -77,12 +77,14 @@ router.delete('/:id', async function (req, res, next) {
     })
     if(articles.length>0){
         return res.json({
-            success: 'false',
+            success: false,
             msg: '请先删除文章'
         });
     }
     category.destroy();
-    res.json({success: true,data:{
+    res.json({success: true,
+        msg: '删除成功',
+        data:{
             category: category,
         }});
 });

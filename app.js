@@ -11,6 +11,11 @@ var articlesRouter = require('./routes/admin/articles');
 var article_categoriesRouter = require('./routes/admin/article_categories');
 var coursesRouter = require('./routes/admin/courses');
 var course_categoriesRouter = require('./routes/admin/course_categories');
+var usersRouter = require('./routes/admin/users');
+var chaptersRouter=require('./routes/admin/chapters');
+var echartsRouter =require('./routes/admin/echarts');
+var admin_login = require('./middlewares/admin_login');
+var loginRouter = require('./routes/admin/login');
 
 var app = express();
 
@@ -28,10 +33,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/admin/articles', articlesRouter);
-app.use('/admin/article_categories', article_categoriesRouter);
-app.use('/admin/courses', coursesRouter);
-app.use('/admin/course_categories', course_categoriesRouter);
+app.use('/admin/articles',admin_login(), articlesRouter);
+app.use('/admin/article_categories',admin_login(), article_categoriesRouter);
+app.use('/admin/courses',admin_login(), coursesRouter);
+app.use('/admin/course_categories',admin_login(), course_categoriesRouter);
+app.use('/admin/users',admin_login(), usersRouter);
+app.use('/admin/chapters',admin_login(),chaptersRouter);
+app.use('/admin/echarts',echartsRouter);
+app.use('/login', loginRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

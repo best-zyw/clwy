@@ -1,6 +1,6 @@
 'use strict';
 const {
-  Model
+  Model, INTEGER
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Course extends Model {
@@ -15,10 +15,15 @@ module.exports = (sequelize, DataTypes) => {
         as:'category',
         foreignKey:'categoryId'
       });
+      models.Course.belongsTo(models.User,{
+        as:'user',
+        foreignKey:'userId'
+      });
+      models.Course.hasMany(models.Chapter, {foreignKey: 'CourseId'});
     }
   };
   Course.init({
-    CategoryId: DataTypes.INTEGER,
+    categoryId: DataTypes.INTEGER,
     userId: DataTypes.INTEGER,
     name: DataTypes.STRING,
     body: DataTypes.TEXT,

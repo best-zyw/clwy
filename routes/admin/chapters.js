@@ -11,36 +11,30 @@ router.get('/', async function (req, res, next) {
 
     // 模糊查询标题
     var title = req.query.title;
+    var CourseId = req.query.CourseId;
 
     if (title) {
         where.title = {
             [Op.like]: '%' + title + '%'
         }
+    };
+    if(CourseId){
+        where.CourseId=CourseId
     }
 
-    var result = await models.Course.findAndCountAll({
-        order: [
-            ['id', 'DESC']
-        ],
+    var result = await models.Chapter.findAndCountAll({
+        order: [['sort', 'ASC']],
         where: where,
-        include: [{
-                model: models.CourseCategory,
-                as: 'category',
-            },
-            {
-                model: models.User,
-                as: 'user'
-            },
-            {
-                model: models.Chapter,
-            }
-        ],
+        include: {
+            model:models.Course,
+            // as:'Course'
+        },
         offset: (currentPage - 1) * pageSize,
         limit: pageSize
     });
 
     res.json({
-        Courses: result.rows,
+        Chapters: result.rows,
         pagination: {
             currentPage: currentPage,
             pageSize: pageSize,
@@ -53,40 +47,30 @@ router.get('/', async function (req, res, next) {
 
 // 新增
 router.post('/', async function (req, res, next) {
-    var Course = await models.Course.create(req.body)
-    res.json({
-        Course: Course
-    });
+    var Chapter = await models.Chapter.create(req.body)
+    res.json({Chapter: Chapter});
 });
 
 // 查询单条文章
 router.get('/:id', async function (req, res, next) {
-    var Course = await models.Course.findOne({
-        where: {
-            id: req.params.id
-        },
+    var Chapter = await models.Chapter.findOne({
+        where: {id: req.params.id},
     });
-    res.json({
-        Course: Course
-    });
+    res.json({Chapter: Chapter});
 });
 
 // 修改
 router.put('/:id', async function (req, res, next) {
-    var Course = await models.Course.findByPk(req.params.id);
-    Course.update(req.body);
-    res.json({
-        Course: Course
-    });
+    var Chapter = await models.Chapter.findByPk(req.params.id);
+    Chapter.update(req.body);
+    res.json({Chapter: Chapter});
 });
 
 // 删除
 router.delete('/:id', async function (req, res, next) {
-    var Course = await models.Course.findByPk(req.params.id);
-    Course.destroy();
-    res.json({
-        msg: '删除成功'
-    });
+    var Chapter = await models.Chapter.findByPk(req.params.id);
+    Chapter.destroy();
+    res.json({msg: '删除成功'});
 });
 
 module.exports = router;
