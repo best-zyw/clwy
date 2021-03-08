@@ -12,19 +12,24 @@ module.exports = function (options) {
         }
 
         //验证token是否正确
-        jwt.verify(token,'hdasdasd', function (err, decoded) {
+        jwt.verify(token, 'hdasdasd', function (err, decoded) {
             if (err) {
                 return res.status(401).send({
                     success: false,
                     message: 'token过期，请重新登录'
                 });
             }
-
+            var reg=/\/admin/
+            if(reg.test(req.url)&&!decoded.user.admin){
+                return res.status(401).send({
+                    success: false,
+                    message: '当前接口是管理员接口'
+                })
+            }
             //解析出来的数据存入req
             req.user = decoded.user;
-        })
 
-        next();
+        })
+            next();
     }
 }
-
